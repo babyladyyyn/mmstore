@@ -3,6 +3,6 @@
 
 /usr/local/spark
 /usr/local/hadoop
-/data/conf/
+#/data/conf/
 #
 #/usr/local/*

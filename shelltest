@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+
+exec 3>&1
+
+fun(){
+	echo "Helloworld" >&2
+}
+
+echo "abc" >&3
+
+result=(`fun`)
