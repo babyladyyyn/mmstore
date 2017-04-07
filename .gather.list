@@ -1,0 +1,8 @@
+#config files or paths to be collect
+
+
+/usr/local/spark
+/usr/local/hadoop
+/data/conf/
+#
+#/usr/local/*
