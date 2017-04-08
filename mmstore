@@ -2,6 +2,10 @@
 
 START_DIR=$(cd $(dirname .);pwd)
 filter=${1-*}
+MMSTORE_HOME=${MMSTORE_HOME-$(pwd)}
+[ -f "$MMSTORE_HOME"/.mmstore.list ] && MMSTORE_HOME=$(pwd)
+cd $MMSTORE_HOME
+
 
 if [ ! -f .mmstore.list ];
 then
@@ -22,9 +26,9 @@ do
 			_exclude_append="--exclude "$t
 		done
 	fi
-	_relative_fullpath=${_real_fullpath#/}	
-	_target_real_fullpath=$START_DIR/$_relative_fullpath
-	_target_real_fullpath=$(dirname $_target_real_fullpath)
+	_relative_fullpath=${_real_fullpath}	
+	_target_real_fullpath=$START_DIR$_relative_fullpath
+	_target_real_dirpath=$(dirname $_target_real_fullpath)/
 	
 	[ -e $_real_fullpath ] || continue
 	[ -f $_real_fullpath ] && [ ! -f $_target_real_fullpath ] && rm -fr $_target_real_fullpath
@@ -32,6 +36,14 @@ do
 	_dirname=$(dirname $_target_real_fullpath)
 	[ ! -e "$_dirname" ] && mkdir -p $_target_real_fullpath
 	#echo "rsync -aLr --delete $_real_fullpath $_target_real_fullpath"
-	echo "rsync -aLr --delete $_real_fullpath $_target_real_fullpath $_exclude_append"
-	rsync -aLr --force --delete $_real_fullpath $_target_real_fullpath $_exclude_append 
+	if [ -d "$_real_fullpath" ];
+	then
+		echo "rsync -aLr --delete $_real_fullpath $_target_real_dirpath $_exclude_append"
+		rsync -aLr --force --delete $_real_fullpath $_target_real_dirpath $_exclude_append 
+	fi
+	if [ -f "$_real_fullpath" ];
+	then
+		echo "rsync -aLr --delete $_real_fullpath $_target_real_fullpath $_exclude_append"
+		rsync -aLr --force --delete $_real_fullpath $_target_real_fullpath $_exclude_append 
+	fi
 done
