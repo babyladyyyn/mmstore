@@ -1,9 +1,16 @@
-#config files or paths to be collect
-
-
-/usr/local/spark
+/data/conf
 /usr/local/hadoop
-
-#/data/conf/
-#
-#/usr/local/*
+/usr/local/hbase
+/usr/local/hive
+/usr/local/java
+/usr/local/jetty
+/usr/local/kafka
+/usr/local/kiev-bak
+/usr/local/maven
+/usr/local/nginx
+/usr/local/redis
+/usr/local/scala
+/usr/local/spark
+/usr/local/taobao
+/usr/local/varnish
+/usr/local/zookeeper
