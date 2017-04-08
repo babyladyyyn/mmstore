@@ -34,7 +34,7 @@ do
 	[ ! -e "$_dirname" ] && mkdir -p $_real_fullpath
 	if [ -d $_target_real_fullpath ];
 	then
-		echo "rsync -aLr --delete $_target_real_fullpath $_real_fulldire$_exclude_append"
+		echo "rsync -aLr --delete $_target_real_fullpath $_real_fulldir $_exclude_append"
 		rsync -aLr --delete $_target_real_fullpath $_real_fulldir $_exclude_append
 	fi
 	if [ -f $_target_real_fullpath ];
