@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 #
 dir=$(cd $(dirname .);pwd)
-gather_cmd=$dir/gather2
+GATHER_CMD=$dir/gather2
+export GATHER_CMD
+
 from_path=${1-$dir}
 to_path=${2-$dir}
 
 
 dogather(){
-
-
-	local _gather_cmd=$(readlink -f $1)
-	local _from_path=$(readlink -f $2)
-	local _to_path=$(readlink -f $3)
+	local _from_path=$(readlink -f $1)
+	local _to_path=$(readlink -f $2)
 	local _gatherlist=`gatherlist $_from_path`
-	echo  ">>" $1 , $2 , $3 >&2
-	echo  $_gather_cmd , $_from_path , $_to_path >&2
+	echo  ">>" $1 , $2  >&2
+	echo  $_from_path , $_to_path >&2
 	cd $_from_path
 	for i in $_gatherlist
 	do
@@ -32,32 +31,35 @@ dogather(){
 				echo "dir:rsync -aLr --delete $_diri $_to_path/$_basename" >&2
 				rsync -aLr --delete $_diri $_to_path/$_basename
 			else
-				echo "(dogather $_gather_cmd $_diri $_to_path/$_basename)" >&2
+				echo "(dogather $_diri $_to_path/$_basename)" >&2
 				[ -d $_to_path/$_basename ] || mkdir -p $_to_path/$_basename
-				`(dogather $_gather_cmd $_diri $_to_path/$_basename)`
+				`(dogather $_diri $_to_path/$_basename)`
 			fi
 		fi
 		
 	done
 }
 
-gatherlist(){
+dogatherlist(){
 	local _from_path=$1
+	#local _gatherlist=$(ls -A $_from_path|awk '{print "'$_from_path'/"$0}')
+	#echo ${$gatherlist[*]}
+	echo $_from_path
+}
+
+dogatherfilelist(){
+	local _from_path=$1
+	echo $_from_path
+	echo ${_gatherlist[*]}
 	if [ -f "$_from_path/.gather.list" ];
 	then
 		_gatherlist=$(cat $_from_path/.gather.list|grep -v "#"|sed '/^\s*$/d')
-		if [ -z $_gatherlist ];
-		then
-		_gatherlist=$(ls -A $_from_path|awk '{print "'$_from_path'/"$0}')
-		fi
-	else
-	_gatherlist=($_from_path)
+		echo ${_gatherlist[*]}
 	fi
-	echo ${_gatherlist[*]}
 }
 
 #echo "(`gatherlist $from_path`)"
 
-result=(`dogather $gather_cmd $from_path $to_path`)
+result=(`dogather $from_path $to_path`)
 echo ${result[*]}
 

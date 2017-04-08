@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+START_DIR=$(cd $(dirname .);pwd)
+filter=${1-*}
+
+if [ ! -f .mmstore.list ];
+then
+	echo "ERROR:.mmstore.list is not existed"
+	exit
+fi
+
+lists=$(cat .mmstore.list|grep -v "#"|grep -E "$filter"|sed '/^\s*$/d')
+for i in ${lists[*]}
+do
+	_real_fullpath=$i
+	_relative_fullpath=${_real_fullpath#/}
+	_real_fullpath=$(dirname $_real_fullpath)/
+	_target_real_fullpath=$START_DIR/$_relative_fullpath
+	[ -f "$_target_real_fullpath/.mmstore.ignore" ] && _exclude_paths=$(cat $_target_real_fullpath/.mmstore.ignore |grep -v "#"|grep -E "$filter"|sed '/^\s*$/d')
+	_exclude_append=""
+	if [ -n "$_exclude_paths" ];
+	then
+		for t in ${_exclude_paths[@]}
+		do
+			_exclude_append="--exclude "$t
+		done
+	fi
+	
+	[ -e $_real_fullpath ] || continue
+	[ -f $_real_fullpath ] && [ ! -f $_target_real_fullpath ] && rm -fr $_target_real_fullpath
+	[ -d $_real_fullpath ] && [ ! -d $_target_real_fullpath ] && rm -fr $_target_real_fullpath
+	_dirname=$(dirname $_target_real_fullpath)
+	[ ! -e "$_dirname" ] && mkdir -p $_target_real_fullpath
+	#echo "rsync -aLr --delete $_real_fullpath $_target_real_fullpath"
+	echo "rsync -aLr --delete $_target_real_fullpath $_real_fullpath $_exclude_append"
+	#rsync -aLr --force --delete $_real_fullpath $_target_real_fullpath $_exclude_append 
+	rsync -aLr --delete $_target_real_fullpath $_real_fullpath $_exclude_append
+	#rsync -aLr --delete $_target_real_fullpath /tmp/tmp/ $_exclude_append
+done
