@@ -2,18 +2,19 @@
 
 START_DIR=$(cd $(dirname .);pwd)
 filter=${1-*}
+echo $MMSTORE_HOME
 MMSTORE_HOME=${MMSTORE_HOME-$(pwd)}
-[ -f "$MMSTORE_HOME"/.mmstore.list ] && MMSTORE_HOME=$(pwd)
+[ ! -f "$MMSTORE_HOME"/.mmstore.list ] && MMSTORE_HOME=$(pwd)
 cd $MMSTORE_HOME
 
 
-if [ ! -f .mmstore.list ];
+if [ ! -f "$MMSTORE_HOME"/.mmstore.list ];
 then
 	echo "ERROR:.mmstore.list is not existed"
 	exit
 fi
 
-lists=$(cat .mmstore.list|grep -v "#"|grep -E "$filter"|sed '/^\s*$/d')
+lists=$(cat $MMSTORE_HOME/.mmstore.list|grep -v "#"|grep -E "$filter"|sed '/^\s*$/d')
 for i in ${lists[*]}
 do
 	_real_fullpath=$i
@@ -27,7 +28,7 @@ do
 		done
 	fi
 	_relative_fullpath=${_real_fullpath}	
-	_target_real_fullpath=$START_DIR$_relative_fullpath
+	_target_real_fullpath=$MMSTORE_HOME$_relative_fullpath
 	_target_real_dirpath=$(dirname $_target_real_fullpath)/
 	
 	[ -e $_real_fullpath ] || continue
